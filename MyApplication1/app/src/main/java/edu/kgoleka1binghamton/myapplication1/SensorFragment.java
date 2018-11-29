@@ -9,6 +9,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.util.FloatMath;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -93,12 +94,18 @@ public class SensorFragment extends Fragment implements SensorEventListener {
                 "z = " + Float.toString(event.values[2]) + "\n"
         );
 
-        if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+        Log.d("SensorTypeDebug1:",event.sensor.getName());
+
+
+        if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER ) {
             detectShake(event);
+            //detectRotation(event);
         }
         else if(event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
-            detectRotation(event);
+           detectRotation(event);
         }
+
+
     }
 
     @Override
