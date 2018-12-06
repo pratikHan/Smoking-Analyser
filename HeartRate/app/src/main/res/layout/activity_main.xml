@@ -24,26 +24,30 @@
             android:layout_height="wrap_content"
             android:layout_gravity="top"
             android:layout_marginLeft="40dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="40dp"
 
 
-            android:text="Heart Rate:" />
+            android:text="H R" />
 
         <TextView
             android:id="@+id/value_hr"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="70dp"
+            android:layout_height="40dp"
             android:layout_gravity="top"
-            android:layout_marginLeft="115dp"
-            android:layout_marginTop="20dp"
-            android:text="00" />
+            android:layout_marginLeft="100dp"
+            android:textStyle="bold"
+
+            android:layout_marginTop="30dp"
+            android:textSize="30dp"
+            android:text="00"
+            />
 
         <TextView
             android:id="@+id/textlabelACC"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="top"
-            android:layout_marginTop="50dp"
+            android:layout_marginTop="80dp"
             android:layout_marginLeft="40dp"
             android:text="Accelerometer:" />
 
@@ -52,9 +56,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:layout_marginTop="40dp"
 
-            
+
             android:text="00" />
+
+        <Button
+            android:id="@+id/button"
+            android:layout_width="71dp"
+            android:layout_height="37dp"
+            android:layout_marginLeft="60dp"
+            android:text="Button" />
 
     </FrameLayout>
 </android.support.wear.widget.BoxInsetLayout>

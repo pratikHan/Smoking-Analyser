@@ -1,16 +1,25 @@
 package com.example.pratikhanchate.heartrate;
 
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.Debug;
 import android.support.wearable.activity.WearableActivity;
 import android.support.wearable.view.WatchViewStub;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.TextView;
+
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.app.NotificationCompat.WearableExtender;
+import android.widget.Toast;
 
 public class MainActivity extends WearableActivity implements SensorEventListener {
 
@@ -22,12 +31,44 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     private long mRotationTime = 0;
     private long mShakeTime = 0;
 
+    private Button b1;
     private static final String TAG = "MainActivity";
     private TextView mTextView,mTextAcc;
     SensorManager mSensorManager;
     Sensor mHeartRateSensor,mAccelerometer,mGyro;
 
+    float x=0.0f;
+    float y=0.0f;
+    float z=0.0f;
+
+    int lift_counter=0;
+
     SensorEventListener sensorEventListener;
+
+    float init_x=0.0f;
+    float init_y=0.0f;
+    float init_z=0.0f;
+
+    boolean h_down=false;
+    boolean h_up=false;
+    boolean init_flag=false;
+    int handsup_counter=0;
+    int handsdown_counter=0;
+
+    private int init_HEARTRATE=0;
+
+
+
+    NotificationManagerCompat notificationManager;
+    NotificationCompat.Builder notificationBuilder;
+
+
+
+
+
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +80,9 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
         mTextView = (TextView) findViewById(R.id.value_hr);
         mTextAcc=(TextView) findViewById(R.id.value_acc);
+        b1=(Button) findViewById(R.id.button);
+
+        /*
 
         mSensorManager = ((SensorManager) getSystemService(SENSOR_SERVICE));
         mHeartRateSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
@@ -52,15 +96,39 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
         mSensorManager.registerListener(sensorEventListener, mHeartRateSensor, mSensorManager.SENSOR_DELAY_FASTEST);
 
-
+*/
         Log.d(TAG, "LISTENERS REGISTERED.");
 
-      //  mTextView.setText("Test");
+       Intent vintent =new Intent(this,NotifActivity.class);
+       vintent.putExtra("EXTRA_EVENT_ID",1);
+        PendingIntent viewPendingIntent=PendingIntent.getActivity(this,0,vintent,PendingIntent.FLAG_CANCEL_CURRENT);
+        notificationBuilder =new NotificationCompat.Builder(this)
+                .setSmallIcon(R.drawable.ic_full_sad)
+                .setContentTitle("HEART RATE")
+                .setContentText("SmoKing DEtected")
+                .setContentIntent(viewPendingIntent);
+
+         notificationManager =
+                NotificationManagerCompat.from(this);
+
+
+
+        b1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("DEBUG","Button Pressed");
+                notificationManager.notify(1,notificationBuilder.build());
+                Log.d("DEBUG","Button PressedY");
+            }
+        });
+
 
 
 
         // Enables Always-on
       //  setAmbientEnabled();
+
+
     }
 
     public void onResume(){
@@ -73,6 +141,11 @@ public class MainActivity extends WearableActivity implements SensorEventListene
       //  Log.d("DEBUGXX","Sensor changed");
 
         if (event.sensor.getType() == Sensor.TYPE_HEART_RATE) {
+
+            if(init_HEARTRATE==0){
+                init_HEARTRATE=(int)event.values[0];
+            }
+
             String msg = "" + (int)event.values[0];
             mTextView.setText(msg);
             Log.d("Heart Rate", msg);
@@ -80,11 +153,57 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         if(event.sensor.getType()==Sensor.TYPE_ACCELEROMETER){
             Log.d("SENSOR", "ACcelerometer activated");
 
+
+
+
+            x=event.values[0];
+            y=event.values[1];
+            z=event.values[2];
+
+         //   if(init_x==0 && init_y==0 && init_z==0){
+
+                if( (x>=-9) && (x<=0)){
+
+                    h_down=true;
+                    h_up=false;
+                    init_flag=false;
+
+                    Log.d("LIFT_","Down");
+
+
+                }
+
+
+                init_y=y;
+                init_z=z;
+
+
+
             mTextAcc.setText(
                     "x = " + Float.toString(event.values[0]) + "\n" +
                             "y = " + Float.toString(event.values[1]) + "\n" +
                             "z = " + Float.toString(event.values[2]) + "\n"
             );
+
+
+            if(x<=9 && x>=6){
+                h_up=true;
+                h_down=false;
+
+                if(!init_flag){
+                handsup_counter++;
+                    Toast.makeText(this,"LIFTED :"+handsup_counter,Toast.LENGTH_SHORT).show();
+                    Log.d("LIFT_","LIFT_COUNTER:"+handsup_counter);
+                }
+
+                init_flag=true;
+
+
+
+            }
+
+
+
 
             Log.d("VALUES","x = " + Float.toString(event.values[0]) + "\n" +
                     "y = " + Float.toString(event.values[1]) + "\n" +
@@ -126,7 +245,9 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         }
     }
 
-    private void detectShake(SensorEvent event) {
+
+
+    private void detectLift(SensorEvent event) {
         long now = System.currentTimeMillis();
 
         if((now - mShakeTime) > SHAKE_WAIT_TIME_MS) {
