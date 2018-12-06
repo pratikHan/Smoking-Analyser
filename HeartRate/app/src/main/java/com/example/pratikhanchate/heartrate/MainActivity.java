@@ -2,6 +2,7 @@ package com.example.pratikhanchate.heartrate;
 
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -14,6 +15,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import android.support.v4.app.NotificationCompat;
@@ -49,6 +51,10 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     float init_y=0.0f;
     float init_z=0.0f;
 
+
+    boolean hr_increase=false;
+    boolean lifted_cig=false;
+
     boolean h_down=false;
     boolean h_up=false;
     boolean init_flag=false;
@@ -56,12 +62,14 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     int handsdown_counter=0;
 
     private int init_HEARTRATE=0;
+    private int init_ALERT=0;
 
 
 
     NotificationManagerCompat notificationManager;
     NotificationCompat.Builder notificationBuilder;
 
+    FrameLayout frameLayout;
 
 
 
@@ -80,9 +88,11 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
         mTextView = (TextView) findViewById(R.id.value_hr);
         mTextAcc=(TextView) findViewById(R.id.value_acc);
-        b1=(Button) findViewById(R.id.button);
+        frameLayout=(FrameLayout) findViewById(R.id.background1);
 
-        /*
+
+
+
 
         mSensorManager = ((SensorManager) getSystemService(SENSOR_SERVICE));
         mHeartRateSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
@@ -96,10 +106,12 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
         mSensorManager.registerListener(sensorEventListener, mHeartRateSensor, mSensorManager.SENSOR_DELAY_FASTEST);
 
-*/
+
         Log.d(TAG, "LISTENERS REGISTERED.");
 
-       Intent vintent =new Intent(this,NotifActivity.class);
+
+
+     /*  Intent vintent =new Intent(this,NotifActivity.class);
        vintent.putExtra("EXTRA_EVENT_ID",1);
         PendingIntent viewPendingIntent=PendingIntent.getActivity(this,0,vintent,PendingIntent.FLAG_CANCEL_CURRENT);
         notificationBuilder =new NotificationCompat.Builder(this)
@@ -113,14 +125,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
 
 
-        b1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d("DEBUG","Button Pressed");
-                notificationManager.notify(1,notificationBuilder.build());
-                Log.d("DEBUG","Button PressedY");
-            }
-        });
+       */
 
 
 
@@ -133,6 +138,13 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
     public void onResume(){
         super.onResume();
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+       // mSensorManager.unregisterListener(sensorEventListener);
     }
 
     @Override
@@ -149,6 +161,21 @@ public class MainActivity extends WearableActivity implements SensorEventListene
             String msg = "" + (int)event.values[0];
             mTextView.setText(msg);
             Log.d("Heart Rate", msg);
+
+            if((int)event.values[0]>= (1.01*init_HEARTRATE)){
+                hr_increase=true;
+            }
+
+            if(init_ALERT==0){
+
+                if(lifted_cig&&hr_increase) {
+                    init_ALERT = 1;
+
+                    Toast.makeText(this, "Smoking Alert " , Toast.LENGTH_LONG).show();
+                    frameLayout.setBackgroundColor(Color.RED);
+                }
+            }
+
         }
         if(event.sensor.getType()==Sensor.TYPE_ACCELEROMETER){
             Log.d("SENSOR", "ACcelerometer activated");
@@ -194,13 +221,31 @@ public class MainActivity extends WearableActivity implements SensorEventListene
                 handsup_counter++;
                     Toast.makeText(this,"LIFTED :"+handsup_counter,Toast.LENGTH_SHORT).show();
                     Log.d("LIFT_","LIFT_COUNTER:"+handsup_counter);
+
+                    frameLayout.setBackgroundColor(Color.GREEN);
+                    if(handsup_counter>3){
+                        lifted_cig=true;
+
+                    }
+
+
                 }
 
                 init_flag=true;
 
 
 
+            }else{
+
+                if(init_ALERT==1){
+                    frameLayout.setBackgroundColor(Color.RED);
+                }else{
+                    frameLayout.setBackgroundColor(Color.BLUE);
+                }
+
+
             }
+
 
 
 

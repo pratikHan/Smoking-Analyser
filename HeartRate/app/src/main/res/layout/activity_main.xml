@@ -2,6 +2,7 @@
 <android.support.wear.widget.BoxInsetLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/dark_grey"
@@ -10,10 +11,12 @@
     tools:deviceIds="wear">
 
     <FrameLayout
+        android:id="@+id/background1"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="@dimen/inner_frame_layout_padding"
 
+        android:background="@color/blue"
 
         >
 
@@ -31,16 +34,15 @@
 
         <TextView
             android:id="@+id/value_hr"
-            android:layout_width="70dp"
-            android:layout_height="40dp"
-            android:layout_gravity="top"
-            android:layout_marginLeft="100dp"
-            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
 
-            android:layout_marginTop="30dp"
-            android:textSize="30dp"
+            android:layout_gravity="center"
             android:text="00"
-            />
+
+            android:layout_marginBottom="10dp"
+            android:textSize="60dp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/textlabelACC"
@@ -49,6 +51,7 @@
             android:layout_gravity="top"
             android:layout_marginTop="80dp"
             android:layout_marginLeft="40dp"
+            android:visibility="invisible"
             android:text="Accelerometer:" />
 
         <TextView
@@ -57,16 +60,12 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="40dp"
+            android:visibility="invisible"
 
 
             android:text="00" />
 
-        <Button
-            android:id="@+id/button"
-            android:layout_width="71dp"
-            android:layout_height="37dp"
-            android:layout_marginLeft="60dp"
-            android:text="Button" />
+
 
     </FrameLayout>
 </android.support.wear.widget.BoxInsetLayout>
